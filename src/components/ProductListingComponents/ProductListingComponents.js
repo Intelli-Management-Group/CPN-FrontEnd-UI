@@ -7,6 +7,7 @@ import { addtoCartItems, updateCartItems } from "../../redux/action/cart-action"
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStoreSlash } from '@fortawesome/free-solid-svg-icons';
+import { isOnSale, getEffectivePrice } from '../../helpers/PriceHelper';
 
 
 
@@ -32,8 +33,8 @@ function ProductListing(props) {
                         return {
                             ...item,
                             purchaseQty: 1 + item?.purchaseQty,
-                            totalPrice: (1 + item?.purchaseQty) * JSON.parse(productItem?.sell_price),
-                            price: productItem.sell_price,
+                            totalPrice: (1 + item?.purchaseQty) * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
+                            price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                             sku: productItem.sku,
                             availableQty: productItem?.quantity
                         };
@@ -53,10 +54,10 @@ function ProductListing(props) {
                     name: productItem.name,
                     image: productItem.images,
                     description: productItem.description,
-                    price: productItem.sell_price,
+                    price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                     sku: productItem.sku,
                     purchaseQty: 1,
-                    totalPrice: 1 * JSON.parse(productItem.sell_price),
+                    totalPrice: 1 * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
                     is_tax_apply: productItem?.is_tax_apply,
                     availableQty: productItem?.quantity
 
@@ -104,10 +105,10 @@ function ProductListing(props) {
                     <div className="d-flex mt-2 justify-content-between">
 
                         <div>
-                            {productItem?.sell_price === productItem?.price && (
+                            {!isOnSale(productItem?.sell_price) && (
                                 <span className="normalPriceLabel sf-Regular">${productItem?.price}</span>
                             )}
-                            {productItem?.sell_price !== productItem?.price && (
+                            {isOnSale(productItem?.sell_price) && (
                                 <>
                                 <div className="priceLabel sf-Bold">${productItem?.sell_price}</div>
                                 <span className="actualPrice sf-Regular">${productItem?.price}</span>

@@ -14,6 +14,7 @@ import ReactImageMagnify from 'react-image-magnify';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Toast, notifySuccess, notifyError } from '../../components/ToastComponents/ToastComponents';
+import { isOnSale, getEffectivePrice } from '../../helpers/PriceHelper';
 import FooterComponents from "../../components/FooterComponents/FooterComponents";
 import AtrributeServices from "../../services/attributeServices";
 import { Tabs, Tab, Row, Col, Container } from 'react-bootstrap';
@@ -351,8 +352,8 @@ function ProductDetails() {
                         return {
                             ...item,
                             purchaseQty: quantity + item?.purchaseQty,
-                            totalPrice: (quantity + item?.purchaseQty) * (selectedProductsVarints ? JSON.parse(selectedProductsVarints?.sell_price) : JSON.parse(product.sell_price)),
-                            price: selectedProductsVarints ? selectedProductsVarints?.sell_price : product.sell_price,
+                            totalPrice: (quantity + item?.purchaseQty) * Number(selectedProductsVarints ? getEffectivePrice(selectedProductsVarints?.sell_price, selectedProductsVarints?.originalPrice) : getEffectivePrice(product.sell_price, product.price)),
+                            price: selectedProductsVarints ? getEffectivePrice(selectedProductsVarints?.sell_price, selectedProductsVarints?.originalPrice) : getEffectivePrice(product.sell_price, product.price),
                             sku: selectedProductsVarints ? selectedProductsVarints?.sell_price : product.sku,
                             availableQty: product?.quantity
                         };
@@ -372,10 +373,10 @@ function ProductDetails() {
                     name: product.name,
                     image: product.images,
                     description: product.description,
-                    price: selectedProductsVarints ? selectedProductsVarints?.sell_price : product.sell_price,
+                    price: selectedProductsVarints ? getEffectivePrice(selectedProductsVarints?.sell_price, selectedProductsVarints?.originalPrice) : getEffectivePrice(product.sell_price, product.price),
                     sku: selectedProductsVarints ? selectedProductsVarints?.sell_price : product.sku,
                     purchaseQty: quantity,
-                    totalPrice: quantity * (selectedProductsVarints ? JSON.parse(selectedProductsVarints?.sell_price) : JSON.parse(product.sell_price)),
+                    totalPrice: quantity * Number(selectedProductsVarints ? getEffectivePrice(selectedProductsVarints?.sell_price, selectedProductsVarints?.originalPrice) : getEffectivePrice(product.sell_price, product.price)),
                     is_tax_apply: product?.is_tax_apply,
                     availableQty: product?.quantity
                 };
@@ -580,8 +581,8 @@ function ProductDetails() {
                     return {
                         ...item,
                         purchaseQty: 1 + item?.purchaseQty,
-                        totalPrice: (1 + item?.purchaseQty) * JSON.parse(productItem?.sell_price),
-                        price: productItem.sell_price,
+                        totalPrice: (1 + item?.purchaseQty) * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
+                        price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                         sku: productItem.sku,
                     };
                 } else {
@@ -596,10 +597,10 @@ function ProductDetails() {
                 name: productItem.name,
                 image: productItem.images,
                 description: productItem.description,
-                price: productItem.sell_price,
+                price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                 sku: productItem.sku,
                 purchaseQty: 1,
-                totalPrice: 1 * JSON.parse(productItem.sell_price),
+                totalPrice: 1 * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
                 is_tax_apply: productItem?.is_tax_apply
             };
             notifySuccess(`${message} added to the cart!`);
@@ -746,8 +747,8 @@ function ProductDetails() {
                                     </div>
                                     <div style={{ borderTop: '1px solid #eee', width: '100%', display: 'flex' }}>
                                         <div className="mt-2 mb-3">
-                                            <span className="product_price priceLabelColor"> ${selectedProductsVarints ? selectedProductsVarints?.sell_price : productData?.sell_price} </span>
-                                            {productData?.quantity > 0 && <span className="ml-2 actualPrice sf-Regular">${selectedProductsVarints ? selectedProductsVarints?.originalPrice : productData?.price}</span>}
+                                            <span className="product_price priceLabelColor"> ${selectedProductsVarints ? getEffectivePrice(selectedProductsVarints?.sell_price, selectedProductsVarints?.originalPrice) : getEffectivePrice(productData?.sell_price, productData?.price)} </span>
+                                            {productData?.quantity > 0 && isOnSale(selectedProductsVarints ? selectedProductsVarints?.sell_price : productData?.sell_price) && <span className="ml-2 actualPrice sf-Regular">${selectedProductsVarints ? selectedProductsVarints?.originalPrice : productData?.price}</span>}
                                             {Number(productData?.quantity) === 0 &&
                                                 <span className="out-of-stock ml-5"> {productData && productData.quantity > 0 ? productData.quantity : "Out of Stock"} </span>
                                             }
@@ -1023,10 +1024,10 @@ function ProductDetails() {
                                                     </div>
                                                     <div className="d-flex mt-2 justify-content-between">
                                                         <div>
-                                                            {item?.sell_price === item?.price && (
+                                                            {!isOnSale(item?.sell_price) && (
                                                                 <span className="normalPriceLabel sf-Regular">${item?.price}</span>
                                                             )}
-                                                            {item?.sell_price !== item?.price && (
+                                                            {isOnSale(item?.sell_price) && (
                                                                 <>
                                                                     <div className="priceLabel sf-Bold">${item?.sell_price}</div>
                                                                     <span className="actualPrice sf-Regular">${item?.price}</span>
