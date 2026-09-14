@@ -9,6 +9,7 @@ import ImageComponent from '../ImageComponents/ImageComponents';
 import ButtonComponent from '../ButtonComponents/ButtonComponents';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStoreSlash } from '@fortawesome/free-solid-svg-icons';
+import { isOnSale } from '../../helpers/PriceHelper';
 
 
 const ProductsListingSlider = ({ data, recordsDisplay, settings, truncateString, addToCart, navigated }) => {
@@ -36,10 +37,10 @@ const ProductsListingSlider = ({ data, recordsDisplay, settings, truncateString,
                                     </div>
                                     <div className="d-flex mt-2 justify-content-between">
                                         <div>
-                                            {category?.sell_price === category?.price && (
+                                            {!isOnSale(category?.sell_price) && (
                                                 <span className="normalPriceLabel sf-Regular">${category?.price}</span>
                                             )}
-                                            {category?.sell_price !== category?.price && (
+                                            {isOnSale(category?.sell_price) && (
                                                 <>
                                                 <div className="priceLabel sf-Bold">${category?.sell_price}</div>
                                                 <span className="actualPrice sf-Regular">${category?.price}</span>

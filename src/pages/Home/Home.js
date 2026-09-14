@@ -22,6 +22,7 @@ import ProductsListingSlider from '../../components/ProductsListingSlider/Produc
 import { setBrandList } from '../../redux/action/brand-action';
 import { setDefaultTemplateList } from '../../redux/action/template-action';
 import AuthServices from '../../services/AuthServices';
+import { getEffectivePrice } from '../../helpers/PriceHelper';
 
 const useSlidesToShow = () => {
     const [slidesToShow, setSlidesToShow] = useState(1);
@@ -293,8 +294,8 @@ function HomeScreen() {
                         return {
                             ...item,
                             purchaseQty: 1 + item?.purchaseQty,
-                            totalPrice: (1 + item?.purchaseQty) * JSON.parse(productItem?.sell_price),
-                            price: productItem.sell_price,
+                            totalPrice: (1 + item?.purchaseQty) * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
+                            price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                             sku: productItem.sku,
                             availableQty: productItem?.quantity
                         };
@@ -314,10 +315,10 @@ function HomeScreen() {
                     name: productItem.name,
                     image: productItem.images,
                     description: productItem.description,
-                    price: productItem.sell_price,
+                    price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                     sku: productItem.sku,
                     purchaseQty: 1,
-                    totalPrice: 1 * JSON.parse(productItem.sell_price),
+                    totalPrice: 1 * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
                     is_tax_apply: productItem?.is_tax_apply,
                     availableQty: productItem?.quantity
                 };
