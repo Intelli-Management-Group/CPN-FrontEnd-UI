@@ -8,6 +8,7 @@ import ImageComponent from '../ImageComponents/ImageComponents';
 import { useDispatch, useSelector } from 'react-redux';
 import { notifySuccess } from '../ToastComponents/ToastComponents';
 import { addtoCartItems } from '../../redux/action/cart-action';
+import { getEffectivePrice } from '../../helpers/PriceHelper';
 
 
 const SlideContainer = ({ categories, onSelectCategory, selectedCategory }) => {
@@ -68,10 +69,10 @@ const SlideContainer = ({ categories, onSelectCategory, selectedCategory }) => {
                 name: productItem.name,
                 image: productItem.images,
                 description: productItem.description,
-                price: productItem.sell_price,
+                price: getEffectivePrice(productItem?.sell_price, productItem?.price),
                 sku: productItem.sku,
                 purchaseQty: 1,
-                totalPrice: 1 * JSON.parse(productItem.sell_price),
+                totalPrice: 1 * Number(getEffectivePrice(productItem?.sell_price, productItem?.price)),
                 is_tax_apply: productItem?.is_tax_apply
             };
             notifySuccess(`${message} added to the cart!`);
@@ -96,7 +97,7 @@ const SlideContainer = ({ categories, onSelectCategory, selectedCategory }) => {
                             )}
                         </div>
                         <div className="d-flex mt-2 justify-content-between">
-                            <div className='priceLabel'>${category?.sell_price}</div>
+                            <div className='priceLabel'>${getEffectivePrice(category?.sell_price, category?.price)}</div>
                             <div>
                                 <span className="circle" onClick={(event) => addToCart(event, category)}>
                                     <i className="fas fa-shopping-bag mt-2"></i>
